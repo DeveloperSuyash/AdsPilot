@@ -1,0 +1,313 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- Theme tokens. Dark is the default; [data-theme='light'] flips them. ---- */
+:root {
+  --base-rgb: 11 12 16;
+  --base-elevated-rgb: 18 20 26;
+  --base-surface-rgb: 24 27 35;
+  --base-hover-rgb: 31 35 45;
+  --fg-rgb: 255 255 255;
+  --accent-rgb: 91 99 242;
+  --accent-hover-rgb: 107 114 245;
+  --accent-text-rgb: 169 174 255;
+  --success-rgb: 61 220 151;
+  --warning-rgb: 245 185 66;
+  --danger-rgb: 255 122 122;
+  color-scheme: dark;
+}
+:root[data-theme='light'] {
+  --base-rgb: 245 246 249;
+  --base-elevated-rgb: 255 255 255;
+  --base-surface-rgb: 242 244 248;
+  --base-hover-rgb: 233 236 242;
+  --fg-rgb: 20 22 28;
+  --accent-rgb: 79 70 229;
+  --accent-hover-rgb: 67 56 202;
+  --accent-text-rgb: 67 56 202;
+  --success-rgb: 11 122 75;
+  --warning-rgb: 143 90 0;
+  --danger-rgb: 179 38 30;
+  color-scheme: light;
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-base text-white/95 font-sans text-[14px] leading-[1.5];
+  }
+  ::selection {
+    background: rgb(var(--accent-rgb) / 0.35);
+    color: rgb(var(--fg-rgb));
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--fg-rgb) / 0.14);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--fg-rgb) / 0.24);
+  }
+  input, textarea, select, button {
+    font: inherit;
+  }
+  /* The native dropdown paints its options from the select's own colours, and every
+     select here is translucent white on white text — which composites to invisible.
+     Give the options an opaque background of their own, in both themes. */
+  select option, select optgroup {
+    background-color: rgb(var(--base-elevated-rgb));
+    color: rgb(var(--fg-rgb));
+  }
+}
+
+@layer components {
+  /* A card: a plain raised surface, one hairline, a soft shadow. No glass and no gradient: the design reads as calm and dense. */
+  .glass {
+    @apply bg-base-elevated border border-hairline rounded-2xl shadow-ambient;
+  }
+  .glass-hover {
+    @apply transition-all duration-150 hover:border-white/20 hover:bg-white/[0.06];
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 h-9 text-[13px] font-semibold transition-all duration-150 select-none disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-primary {
+    @apply btn bg-accent text-[#fff] hover:bg-accent-hover active:scale-[0.98] shadow-[0_6px_16px_rgb(var(--accent-rgb)/0.22)];
+  }
+  .btn-ghost {
+    @apply btn text-white/70 hover:text-white hover:bg-white/[0.06];
+  }
+  .btn-secondary {
+    @apply btn bg-base-surface text-white/95 border border-white/[0.16] hover:bg-base-hover;
+  }
+  .btn-danger {
+    @apply btn bg-danger/10 text-danger border border-danger/20 hover:bg-danger/20;
+  }
+  .input {
+    @apply w-full bg-base-surface border border-white/[0.16] rounded-lg px-3 h-9 text-[13px] text-white placeholder:text-white/45
+      focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all duration-150;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1.5 px-2 h-[22px] rounded-full text-[11.5px] font-semibold border border-transparent whitespace-nowrap;
+  }
+  .pill-good { @apply pill bg-success/[0.13] text-success; }
+  .pill-accent { @apply pill bg-accent/[0.14] text-accent; }
+  .pill-watch { @apply pill bg-warning/[0.14] text-warning; }
+  .pill-risk { @apply pill bg-danger/[0.14] text-danger; }
+  .pill-muted { @apply pill bg-white/[0.07] text-white/70; }
+
+  .nav-item {
+    @apply flex items-center gap-2.5 px-2.5 h-[34px] rounded-lg text-[13px] font-medium text-white/70
+      transition-colors duration-150 hover:text-white hover:bg-white/[0.05] cursor-pointer;
+  }
+  .nav-item-active {
+    @apply text-white bg-accent/[0.14] shadow-[inset_2px_0_0_rgb(var(--accent-rgb))] hover:bg-accent/[0.14];
+  }
+  .nav-item-active svg { color: rgb(var(--accent-text-rgb)); }
+  .nav-title {
+    @apply px-2.5 pt-3.5 pb-1.5 text-[10.5px] uppercase tracking-[0.09em] text-white/45 font-semibold;
+  }
+
+  /* Data tables: a lot of numbers in a small space, so the rules are tabular figures
+     and a right edge that lines up. Anything else and a column of clicks cannot be
+     scanned down. */
+  /* border-separate, not the collapse Tailwind's preflight sets: a sticky `th` loses
+     its bottom border under border-collapse, so the head scrolls over the rows with
+     nothing between them. */
+  .data-table {
+    @apply w-full text-sm border-separate border-spacing-0;
+  }
+  .data-table th {
+    @apply text-left text-[11.5px] tracking-[0.02em] text-white/55 font-semibold px-4 py-2.5 border-b border-hairline;
+  }
+  /* The head sticks to the top of the panel's own scroll box. A thousand rows scrolled
+     under a header that has left the screen is a thousand rows of unlabelled numbers —
+     and capping the height is also what stops a long table pushing everything below it
+     off the page. */
+  .table-scroll {
+    @apply max-h-[32rem] overflow-auto;
+  }
+  .data-table thead th {
+    @apply sticky top-0 z-[2] bg-base-elevated;
+  }
+  .data-table td {
+    @apply px-4 py-3 border-b border-hairline/60 text-white/90;
+  }
+  /* A dense table: the crawl lists up to fifty pages at a time, and 100px rows made that five screens of scrolling. */
+  .data-table-compact th {
+    @apply px-3 py-2;
+  }
+  .data-table-compact td {
+    @apply px-3 py-1.5;
+  }
+  .data-table tr:last-child td {
+    @apply border-b-0;
+  }
+  .num {
+    @apply tabular-nums text-right;
+  }
+
+  .shimmer {
+    background: linear-gradient(90deg, rgb(var(--fg-rgb) / 0.04) 0%, rgb(var(--fg-rgb) / 0.12) 50%, rgb(var(--fg-rgb) / 0.04) 100%);
+    background-size: 200% 100%;
+    @apply animate-shimmer;
+  }
+
+  /* ---- Panels ------------------------------------------------------------
+     A `.glass` card is a box with padding, and a screen made of them is a
+     screen with no structure: every block looks equally important and nothing
+     says where one list ends. A panel has a titled head, a hairline under it
+     and rows that run edge to edge, so a reader can tell a heading from an
+     item without reading either.
+
+     Written as classes and not as repeated utilities on purpose — the shape is
+     now the page's grammar, and changing a panel head should not mean editing
+     thirty places in the JSX. */
+  .panel {
+    @apply bg-base-elevated border border-hairline rounded-2xl overflow-hidden shadow-ambient;
+  }
+  /* min-height rather than a fixed one: a head carries a title, a count, a pill and
+     sometimes a segmented control, and on a narrow screen those wrap. A fixed h-12
+     would push the second line straight out of the panel. */
+  .panel-head {
+    @apply flex items-center justify-between gap-3 flex-wrap px-[18px] py-2.5 min-h-[3.25rem] border-b border-hairline;
+  }
+  .panel-title {
+    @apply text-sm font-semibold tracking-[-0.005em] flex items-center gap-2 min-w-0;
+  }
+  /* The way out of a panel, in its top-right corner where it is always in the
+     same place. */
+  .panel-link {
+    @apply text-xs text-white/55 hover:text-accent transition-colors shrink-0 inline-flex items-center gap-1;
+  }
+  .panel-body {
+    @apply p-4;
+  }
+  /* A footnote that belongs to the panel above it rather than to the page. */
+  .panel-note {
+    @apply px-4 py-3 border-t border-hairline text-[11px] text-white/45 leading-relaxed;
+  }
+
+  /* ---- Rows and rails ----------------------------------------------------
+     Findings arrive already ranked. A flat list throws that away: five rows in
+     one typeface read as five equal problems, and the reader re-sorts them by
+     hand. The rail is three pixels of colour that survives a squint. */
+  .prow {
+    @apply flex gap-3 px-4 py-3 border-b border-hairline last:border-b-0;
+  }
+  .prow-tight {
+    @apply px-3.5 py-2;
+  }
+  .prow-link {
+    @apply prow transition-colors hover:bg-white/[0.03] cursor-pointer;
+  }
+  .rail {
+    @apply w-[3px] rounded-full shrink-0 self-stretch;
+  }
+  .rail-high { @apply bg-danger; }
+  .rail-medium { @apply bg-warning; }
+  .rail-low { @apply bg-accent; }
+  .rail-done { @apply bg-white/15; }
+  /* The figures behind a claim. Mono and dimmer than the sentence above it,
+     because this is there to be checked rather than read. */
+  .evidence {
+    @apply text-[11px] font-mono text-white/45 mt-1.5 break-words;
+  }
+
+  /* ---- Metric tile -------------------------------------------------------
+     `lead` marks the one metric the page is about. Without it four identical
+     tiles ask the reader to decide which number matters. */
+  .kpi {
+    @apply relative overflow-hidden bg-base-elevated border border-hairline rounded-2xl p-[18px] shadow-ambient tabular-nums;
+  }
+  .kpi-lead::after {
+    content: '';
+    @apply absolute inset-x-0 bottom-0 h-0.5;
+    background-image: linear-gradient(90deg, rgb(var(--accent-rgb)), transparent);
+  }
+
+  /* ---- Segmented control and tabs ---------------------------------------- */
+  .seg {
+    @apply inline-flex p-[3px] rounded-lg bg-base-surface border border-hairline gap-0.5;
+  }
+  .seg-btn {
+    @apply px-3 h-7 rounded-md text-[12.5px] font-semibold text-white/60 hover:text-white/90 transition-colors;
+  }
+  .seg-btn-on {
+    @apply bg-base-hover text-white shadow-[0_1px_2px_rgba(0,0,0,0.25)];
+  }
+  .tab {
+    @apply px-3.5 h-10 flex items-center gap-2 text-[13px] font-medium border-b-2 -mb-px whitespace-nowrap
+      transition-colors border-transparent text-white/60 hover:text-white/90;
+  }
+  .tab-on {
+    @apply border-accent text-white;
+  }
+  /* A count riding on a tab or a panel head. */
+  .tab-count {
+    @apply text-[11px] font-semibold px-1.5 py-px rounded-full bg-white/[0.08] text-white/70 tabular-nums;
+  }
+
+  /* ---- Table extras -----------------------------------------------------
+     The bar is the row's clicks as a share of the TOP row's, not of the total.
+     The question it answers is "how much of this site rides on the first few
+     rows", and measured against a total every row in a long tail is a sliver
+     too small to compare. */
+  .share {
+    @apply h-1 rounded-full bg-white/[0.08] mt-1.5 overflow-hidden;
+  }
+  .share > i {
+    @apply block h-full;
+    background-image: linear-gradient(90deg, rgb(var(--accent-rgb)), rgb(var(--accent-rgb) / 0.45));
+  }
+  /* Position in the whole list, kept even while the list is filtered — a rank that
+     renumbers itself as you type is worse than no rank. */
+  .rank {
+    @apply font-mono text-[11px] text-white/30 tabular-nums;
+  }
+
+  /* A break in a long settings page, so it reads as three groups and not thirty
+     controls. */
+  .section-label {
+    @apply text-[11px] uppercase tracking-[0.09em] text-white/40 font-semibold pt-2;
+  }
+  /* A suggested question. Full width and left aligned, because these are sentences. */
+  .chip {
+    @apply w-full text-left px-3.5 py-2.5 rounded-lg bg-base-surface border border-hairline text-[13px]
+      hover:border-accent/40 hover:bg-accent/[0.06] transition-colors disabled:opacity-50 disabled:pointer-events-none;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .safe-top { padding-top: env(safe-area-inset-top, 0px); }
+  .text-balance { text-wrap: balance; }
+}
+
+/* Printing the roadmap: the app is dark, paper is not. Everything is forced to dark-on-white, and the
+   chrome (sidebar, bars, buttons marked no-print) is dropped, so "Save as PDF" gives a clean document. */
+@media print {
+  aside, nav, header, .no-print, .tab, [role='tablist'] { display: none !important; }
+  html, body, #root { background: #fff !important; }
+  * { color: #111 !important; background: transparent !important; border-color: #ccc !important; box-shadow: none !important; }
+  .glass { border: 1px solid #ccc !important; break-inside: avoid; }
+  main { margin: 0 !important; padding: 0 !important; max-width: none !important; }
+  /* the app scrolls inside a fixed-height box, which would print as one screen: let every box grow */
+  html, body, #root, div, main, section { height: auto !important; max-height: none !important; overflow: visible !important; position: static !important; }
+}
