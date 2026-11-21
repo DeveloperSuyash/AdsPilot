@@ -1,0 +1,15 @@
+{
+  "name": "adspilot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AdsPilot — Google Ads for agencies. A PilotWorks4u product, at ads.pilotworks4u.com.",
+  "type": "module",
+  "scripts": {
+    "setup": "cd server && npm install && cd .. && cd web && npm install",
+    "build": "npm run build --prefix web",
+    "start": "node server/server.js",
+    "typecheck": "npm run typecheck --prefix web",
+    "test": "node server/test/ads.test.mjs && node server/test/ads-routes.test.mjs && node server/test/server.test.mjs"
+  },
+  "engines": { "node": ">=18" }
+}

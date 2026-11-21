@@ -1,0 +1,16 @@
+[Unit]
+Description=AdsPilot
+After=network.target
+
+[Service]
+User=pilot
+WorkingDirectory=/opt/adspilot/repo
+# nvm is not on systemd's PATH (SEOPilot's SETUP-NEW-MACHINE.md): point at the real node binary.
+ExecStart=/usr/bin/env node server/server.js
+Restart=always
+RestartSec=3
+# The SIGTERM handler flushes the debounced save; give it time.
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,7 @@
+[Unit]
+Description=Deploy AdsPilot from GitHub
+
+[Service]
+Type=oneshot
+User=pilot
+ExecStart=/opt/adspilot/deploy.sh
